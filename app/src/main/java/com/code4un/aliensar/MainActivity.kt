@@ -32,10 +32,11 @@ class MainActivity : GameActivity() {
             ViewCompat.getWindowInsetsController(window.decorView) ?: return
 
         // Configure the behavior of the hidden system bars
-        windowInsetsController.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        windowInsetsController.systemBarsBehavior = (WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_TOUCH)
 
         // Hide both the status bar and the navigation bar
+        windowInsetsController.hide(WindowInsetsCompat.Type.statusBars())
+        windowInsetsController.hide(WindowInsetsCompat.Type.navigationBars())
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
     }
 }
