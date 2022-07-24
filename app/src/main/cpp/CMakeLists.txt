@@ -20,6 +20,8 @@ project("Aliens-AR")
 set( ENGINE_PUBLIC_DIR "${CMAKE_SOURCE_DIR}/engine/public/" )
 set( GAME_PUBLIC_DIR "${CMAKE_SOURCE_DIR}/game/public/" )
 set( HEADERS
+    # Logger
+    "${ENGINE_PUBLIC_DIR}metrics/Logger.hpp"
     # OpenGL Render
     "${ENGINE_PUBLIC_DIR}render/GLRenderer.hpp" )
 
@@ -32,6 +34,8 @@ set( GAME_PRIVATE_DIR "${CMAKE_SOURCE_DIR}/game/private/" )
 set( SOURCES
     # Game.Android
     "native-lib.cpp"
+    # Logger
+    "${ENGINE_PRIVATE_DIR}metrics/Logger.cpp"
     # OpenGL Render
     "${ENGINE_PRIVATE_DIR}render/GLRenderer.cpp" )
 
