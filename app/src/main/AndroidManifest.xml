@@ -10,8 +10,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AliensAR"
+        android:theme="@style/Application.Fullscreen"
         tools:targetApi="31">
+
+        <meta-data android:name="android.app.lib_name"
+            android:value="aliensar" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
