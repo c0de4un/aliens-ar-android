@@ -14,6 +14,28 @@ cmake_minimum_required(VERSION 3.18.1)
 project("Aliens-AR")
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# HEADERS
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+set( ENGINE_PUBLIC_DIR "${CMAKE_SOURCE_DIR}/engine/public/" )
+set( GAME_PUBLIC_DIR "${CMAKE_SOURCE_DIR}/game/public/" )
+set( HEADERS
+    # OpenGL Render
+    "${ENGINE_PUBLIC_DIR}render/GLRenderer.hpp" )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# SOURCES
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+set( ENGINE_PRIVATE_DIR "${CMAKE_SOURCE_DIR}/engine/private/" )
+set( GAME_PRIVATE_DIR "${CMAKE_SOURCE_DIR}/game/private/" )
+set( SOURCES
+    # Game.Android
+    "native-lib.cpp"
+    # OpenGL Render
+    "${ENGINE_PRIVATE_DIR}render/GLRenderer.cpp" )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # BUILD
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -21,8 +43,7 @@ project("Aliens-AR")
 find_package(game-activity REQUIRED CONFIG)
 
 # Add SHARED Library Object
-add_library(aliensar SHARED
-    native-lib.cpp )
+add_library(aliensar SHARED ${HEADERS} ${SOURCES} )
     # app_glue from GameActivity
     #${game-activity-include}/game-activity/native_app_glue/android_native_app_glue.c
     #${game-activity-include}/game-activity/GameActivity.cpp
