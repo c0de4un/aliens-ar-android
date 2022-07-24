@@ -1,34 +1,42 @@
 package com.code4un.aliensar
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.widget.TextView
-import com.code4un.aliensar.databinding.ActivityMainBinding
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import com.google.androidgamesdk.GameActivity
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : GameActivity() {
+    override fun onResume() {
+        super.onResume()
 
-    private lateinit var binding: ActivityMainBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        // Example of a call to a native method
-        binding.sampleText.text = stringFromJNI()
+        // Use the function recommended from the following page:
+        // https://d.android.com/training/system-ui/immersive
+        hideSystemUi()
     }
 
-    /**
-     * A native method that is implemented by the 'aliensar' native library,
-     * which is packaged with this application.
-     */
-    external fun stringFromJNI(): String
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            hideSystemUi()
+        }
+    }
 
     companion object {
-        // Used to load the 'aliensar' library on application startup.
         init {
             System.loadLibrary("aliensar")
         }
+    }
+
+    private fun hideSystemUi() {
+        val windowInsetsController =
+            ViewCompat.getWindowInsetsController(window.decorView) ?: return
+
+        // Configure the behavior of the hidden system bars
+        windowInsetsController.systemBarsBehavior = (WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_TOUCH)
+
+        // Hide both the status bar and the navigation bar
+        windowInsetsController.hide(WindowInsetsCompat.Type.statusBars())
+        windowInsetsController.hide(WindowInsetsCompat.Type.navigationBars())
+        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
     }
 }

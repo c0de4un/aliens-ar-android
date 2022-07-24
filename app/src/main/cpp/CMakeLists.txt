@@ -1,48 +1,72 @@
-# For more information about using CMake with Android Studio, read the
-# documentation: https://d.android.com/studio/projects/add-native-code.html
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-# Sets the minimum version of CMake required to build the native library.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# CMAKE
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+# CMake Version
 cmake_minimum_required(VERSION 3.18.1)
 
-# Declares and names the project.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# PROJECT
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-project("aliensar")
+project("Aliens-AR")
 
-# Creates and names a library, sets it as either STATIC
-# or SHARED, and provides the relative paths to its source code.
-# You can define multiple libraries, and CMake builds them for you.
-# Gradle automatically packages shared libraries with your APK.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# HEADERS
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-add_library( # Sets the name of the library.
-        aliensar
+set( ENGINE_PUBLIC_DIR "${CMAKE_SOURCE_DIR}/engine/public/" )
+set( GAME_PUBLIC_DIR "${CMAKE_SOURCE_DIR}/game/public/" )
+set( HEADERS
+    # OpenGL Render
+    "${ENGINE_PUBLIC_DIR}render/GLRenderer.hpp" )
 
-        # Sets the library as a shared library.
-        SHARED
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# SOURCES
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        # Provides a relative path to your source file(s).
-        native-lib.cpp)
+set( ENGINE_PRIVATE_DIR "${CMAKE_SOURCE_DIR}/engine/private/" )
+set( GAME_PRIVATE_DIR "${CMAKE_SOURCE_DIR}/game/private/" )
+set( SOURCES
+    # Game.Android
+    "native-lib.cpp"
+    # OpenGL Render
+    "${ENGINE_PRIVATE_DIR}render/GLRenderer.cpp" )
 
-# Searches for a specified prebuilt library and stores the path as a
-# variable. Because CMake includes system libraries in the search path by
-# default, you only need to specify the name of the public NDK library
-# you want to add. CMake verifies that the library exists before
-# completing its build.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# BUILD
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-find_library( # Sets the name of the path variable.
-        log-lib
+# GameActivity package
+find_package(game-activity REQUIRED CONFIG)
 
-        # Specifies the name of the NDK library that
-        # you want CMake to locate.
-        log)
+# Add SHARED Library Object
+add_library(aliensar SHARED ${HEADERS} ${SOURCES} )
+    # app_glue from GameActivity
+    #${game-activity-include}/game-activity/native_app_glue/android_native_app_glue.c
+    #${game-activity-include}/game-activity/GameActivity.cpp
+    #${game-activity-include}/game-text-input/gametextinput.cpp)
 
-# Specifies libraries CMake should link to your target library. You
-# can link multiple libraries, such as libraries you define in this
-# build script, prebuilt third-party libraries, or system libraries.
+# Find Libraries
+find_library(
+    log-lib
+    log )
 
-target_link_libraries( # Specifies the target library.
-        aliensar
+# Link Libraries
+target_link_libraries(
+    aliensar
+    # Android API
+    android
+    # The game activity
+    game-activity::game-activity
+    # EGL, required for configuring the display context
+    EGL
+    # GL ES 3, used for the sample renderer
+    GLESv3
+    # for AImageDecoder, to load images from resources
+    jnigraphics
+    ${log-lib} )
 
-        # Links the target library to the log library
-        # included in the NDK.
-        ${log-lib})
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
