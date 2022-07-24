@@ -28,6 +28,12 @@
 #include <game-text-input/gametextinput.cpp>
 
 // Game
+// Include Logger
+#ifndef C0DE4UN_ALIENS_AR_ENGINE_LOGGER_HPP
+#include "engine/public/metrics/Logger.hpp"
+#endif // !C0DE4UN_ALIENS_AR_ENGINE_LOGGER_HPP
+
+// Include GLRenderer
 #ifndef C0DE4UN_ALIENS_AR_ENGINE_GL_RENDERER_HPP
 #include "engine/public/render/GLRenderer.hpp"
 #endif // !C0DE4UN_ALIENS_AR_ENGINE_GL_RENDERER_HPP
@@ -94,6 +100,10 @@ extern "C"
         int events;
         android_poll_source *pSource;
 
+        // Initialize Logger
+        arLog::Initialize();
+        arLog::info("Starting app ...");
+
         do {
             // Process all pending events before running game logic.
             if (ALooper_pollAll(0, nullptr, &events, (void **) &pSource) >= 0) {
@@ -115,6 +125,10 @@ extern "C"
                 android_app_clear_motion_events(pApp->inputBuffers);
             }
         } while (!pApp->destroyRequested);
+
+        // Terminate Logger
+        arLog::info("Stopping app ...");
+        arLog::Terminate();
     }
 }
 
