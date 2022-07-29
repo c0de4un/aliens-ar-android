@@ -22,6 +22,9 @@ set( GAME_PUBLIC_DIR "${CMAKE_SOURCE_DIR}/game/public/" )
 set( HEADERS
     # Logger
     "${ENGINE_PUBLIC_DIR}metrics/Logger.hpp"
+    # Input
+    "${ENGINE_PUBLIC_DIR}input/AccelerometerData.hpp"
+    "${ENGINE_PUBLIC_DIR}input/InputSystem.hpp"
     # OpenGL Render
     "${ENGINE_PUBLIC_DIR}render/GLRenderer.hpp" )
 
@@ -36,6 +39,8 @@ set( SOURCES
     "native-lib.cpp"
     # Logger
     "${ENGINE_PRIVATE_DIR}metrics/Logger.cpp"
+    # Input
+    "${ENGINE_PRIVATE_DIR}input/InputSystem.cpp"
     # OpenGL Render
     "${ENGINE_PRIVATE_DIR}render/GLRenderer.cpp" )
 

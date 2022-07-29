@@ -38,6 +38,11 @@
 #include "engine/public/render/GLRenderer.hpp"
 #endif // !C0DE4UN_ALIENS_AR_ENGINE_GL_RENDERER_HPP
 
+// Include InputSystem
+#ifndef C0DE4UN_ALIENS_AR_ENGINE_INPUT_SYSTEM_HPP
+#include "engine/public/input/InputSystem.hpp"
+#endif // !C0DE4UN_ALIENS_AR_ENGINE_INPUT_SYSTEM_HPP
+
 #define ANDROID_GLUE_APP_DECL
 extern "C"
 {
@@ -104,6 +109,9 @@ extern "C"
         arLog::Initialize();
         arLog::info("Starting app ...");
 
+        // Initialize InputSystem
+        arInput *const inputSystem(arInput::Initialize(pApp->looper));
+
         do {
             // Process all pending events before running game logic.
             if (ALooper_pollAll(0, nullptr, &events, (void **) &pSource) >= 0) {
@@ -111,6 +119,8 @@ extern "C"
                     pSource->process(pApp, pSource);
                 }
             }
+
+            inputSystem->Update();
 
             // Check if any user data is associated. This is assigned in handle_cmd
             if (pApp->userData) {
@@ -125,6 +135,9 @@ extern "C"
                 android_app_clear_motion_events(pApp->inputBuffers);
             }
         } while (!pApp->destroyRequested);
+
+        // Terminate InputSystem
+        arInput::Terminate();
 
         // Terminate Logger
         arLog::info("Stopping app ...");
