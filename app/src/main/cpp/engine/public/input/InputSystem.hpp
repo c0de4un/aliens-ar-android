@@ -15,8 +15,8 @@
  * without specific prior written permission.
 */
 
-#ifndef C0DE4UN_ALIENS_AR_ENGINE_LOGGER_HPP
-#define C0DE4UN_ALIENS_AR_ENGINE_LOGGER_HPP
+#ifndef C0DE4UN_ALIENS_AR_ENGINE_INPUT_SYSTEM_HPP
+#define C0DE4UN_ALIENS_AR_ENGINE_INPUT_SYSTEM_HPP
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
@@ -24,8 +24,31 @@
 // INCLUDES
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Include STL string
-#include <string>
+// Include STL numeric
+#include <cstdint>
+
+// Include RotationData
+#ifndef C0DE4UN_ALIENS_AR_ENGINE_ACCELEROMETER_DATA_HPP
+#include "AccelerometerData.hpp"
+#endif // !C0DE4UN_ALIENS_AR_ENGINE_ACCELEROMETER_DATA_HPP
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// FORWARD-DECLARATIONS
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+// Forward-Declare ASensor
+#if !defined(ANDROID_SENSOR_H) && !defined(ANDROID_ASENSOR_DECL) && !defined(ASensor)
+#define ANDROID_ASENSOR_DECL
+struct ASensor;
+struct ASensorManager;
+struct ASensorEventQueue;
+#endif // !ANDROID_SENSOR_H
+
+// Forward-Declare ALooper
+#if !defined(ANDROID_LOOPER_H) && !defined(ALooper) && !defined(ANDROID_LOOPER_DECL)
+#define ANDROID_LOOPER_DECL
+struct ALooper;
+#endif
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // TYPES
@@ -42,11 +65,7 @@ namespace c0de4un
 
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            // Logger
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-            class Logger final
+            class InputSystem final
             {
 
             private:
@@ -54,22 +73,38 @@ namespace c0de4un
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // CONSTANTS
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+                static constexpr const int LOOPER_ID_USER               = 3;
+                static constexpr const int SENSOR_HISTORY_LENGTH        = 100;
+                static constexpr const int SENSOR_REFRESH_RATE_HZ       = 100;
+                static constexpr const int32_t SENSOR_REFRESH_PERIOD_US = int32_t(1000000 / SENSOR_REFRESH_RATE_HZ);
+                static constexpr const float SENSOR_FILTER_ALPHA        = 0.1f;
+
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // FIELDS
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-                static Logger *mInstance;
+                static InputSystem *mInstance;
+
+                ASensorManager    *mSensorManager;
+                const ASensor     *mRotationSensor;
+                ASensorEventQueue *mSensorEventsQueue;
+                ALooper           *mLooper;
+                AccelerometerData mAccelerometerData;
 
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // CONSTRUCTOR
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-                explicit Logger() noexcept;
+                explicit InputSystem() noexcept;
 
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // METHODS
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-                static void print(unsigned char level, const char *const pMsg);
+                void initialize(ALooper *const pLooper);
 
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -78,31 +113,19 @@ namespace c0de4un
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                // CONSTANTS
-                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-                static constexpr const unsigned char LEVEL_INFO     = 1;
-                static constexpr const unsigned char LEVEL_DEBUG    = 2;
-                static constexpr const unsigned char LEVEL_WARNING  = 3;
-                static constexpr const unsigned char LEVEL_ERROR    = 4;
-
-                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // DESTRUCTOR
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-                ~Logger() noexcept;
+                ~InputSystem() noexcept;
 
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // METHODS
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-                static void Initialize() noexcept;
+                static InputSystem *Initialize(ALooper *pLooper);
                 static void Terminate() noexcept;
 
-                static void info(const char* const pMsg);
-                static void debug(const char* const pMsg);
-                static void warning(const char* const pMsg);
-                static void error(const char* const pMsg);
+                void Update();
 
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             };
@@ -114,9 +137,10 @@ namespace c0de4un
     }
 
 }
-using arLog = c0de4un::aliensar::logic::Logger;
-#define C0DE4UN_ALIENS_AR_ENGINE_LOGGER_DECL
+
+using arInput = c0de4un::aliensar::logic::InputSystem;
+#define C0DE4UN_ALIENS_AR_ENGINE_INPUT_SYSTEM_DECL
 
 // = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-#endif // !C0DE4UN_ALIENS_AR_ENGINE_LOGGER_HPP
+#endif // !C0DE4UN_ALIENS_AR_ENGINE_INPUT_SYSTEM_HPP
